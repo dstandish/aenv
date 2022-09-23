@@ -1,0 +1,28 @@
+# must be rendered with envsubst first
+# use helpers create-dags-volume and delete-dags-volume
+
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-dags-pv
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  hostPath:
+    path: "$AIRFLOW_HOST_PATH_DAGS"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: local-dags-pvc
+spec:
+  storageClassName: hostpath
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi

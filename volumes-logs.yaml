@@ -1,0 +1,28 @@
+# must be rendered with envsubst first
+# use helpers create-logs-volume and delete-logs-volume
+
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-logs-pv
+spec:
+  storageClassName: hostpathlogs
+  capacity:
+    storage: 2Gi
+  accessModes:
+  - ReadWriteMany
+  hostPath:
+    path: "$AIRFLOW_HOST_PATH_LOGS"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: local-logs-pvc
+spec:
+  storageClassName: hostpathlogs
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
