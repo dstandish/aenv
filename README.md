@@ -1,10 +1,24 @@
-# Usage
+# What the hell is this?
 
-Use kubernetes executor with mysql backend and only example_bash_operator.py
+It's like, an immensely hackish version of breeze, for folks who want to avoid docker as much as possible.
+
+Essentially it's just a way of modifying airflow environment variables to set up different configurations.
+
+So for example if you want to use kubernetes executor with mysql backend and only example_bash_operator.py, you can enter this:
 
 ```bash
 aenv --kubernetes --mysql --example-dag example_bash_operator.py
 ```
+
+# Why?
+
+For a while I was using lower-level helpers like `use-kubernetes-executor`, `use-mysql`, `use-example-dag` to accomplish the same thing.  But then I like to run scheduler in this pane, webserver in that pane, and I needed a way to set up the same configuration in both terminal sessions.  So I figured package them up in a utility so I can use a one-liner.
+
+# Anything else?
+
+Well, to use k8s executor locally with a virtualenv scheduler, you need to coordinate a few things.  You need to to get your dags in the image (ideally without rebuilding) and you need to get your logs out of the container.  To do this you create hostpath PVCs. In this repo we also include helpers to do this: `create-dags-volume` and `create-logs-volume`.
+
+Read on for more details.
 
 # Source `aenv.sh` into your shell
 
