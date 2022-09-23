@@ -215,7 +215,7 @@ aenv() {
         shift
         ;;
       --celery)
-        use-sequential-executor
+        use-celery-executor
         shift
         ;;
       -*|--*)
