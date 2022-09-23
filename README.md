@@ -55,4 +55,4 @@ Depending on which DB backend you want to use, it assumes they are configured wi
 
 Default assumption is that you want to use docker image local:latest.
 
-You can change this with env vars or with helper `use-image some-image some-tag`.
+You can change this with env vars or with helper `use-image some-image some-tag` or just set the normal env vars.
