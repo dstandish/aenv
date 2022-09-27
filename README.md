@@ -1,8 +1,6 @@
-# What the hell is this?
+# What is `aenv`?
 
-It's like, an immensely hackish version of breeze, for folks who want to avoid docker as much as possible.
-
-Essentially it's just a way of modifying airflow environment variables to set up different configurations.
+`aenv` is a way of modifying airflow environment variables to set up different configurations.
 
 So for example if you want to use kubernetes executor with mysql backend and only example_bash_operator.py, you can enter this:
 
