@@ -53,12 +53,11 @@ Add `aenv.sh` to your shell profile, e.g.:
 source ~/code/aenv/aenv.sh
 ```
 
-Ensure that `aenv` knows where your airflow repo is:
+If your airflow repo is not located at `~/code/airflow`, set this var before sourcing `aenv.sh`:
 
 ```bash
-AIRFLOW_ROOT_DIR=$HOME/code/airflow  # <-- default is ~/code/airflow
+export AIRFLOW_ROOT_DIR=/path/to/airflow-repo  # only need to set if different from ~/code/airflow
 ```
-
 
 # Using k8s executor and KPO
 
