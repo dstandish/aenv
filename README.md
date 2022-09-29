@@ -62,16 +62,11 @@ AIRFLOW_ROOT_DIR=$HOME/code/airflow  # <-- default is ~/code/airflow
 
 # Using k8s executor and KPO
 
-To use k8s executor locally with a virtualenv scheduler, you need to coordinate a few things.  You need to to get your dags in the image (ideally without rebuilding) and you need to get your logs out of the container.  To do this you create hostpath persistent volumes.
+To use k8s executor locally with a virtualenv scheduler, you need to coordinate a few things.  You need to to get your dags in the image (ideally without rebuilding) and you need to get your logs out of the container.  To do this you create hostpath persistent volumes, and we provide helper functions for this.
 
-First, set these values to something else if desired (defaults shown here):
+> **Note:** By default, the helpers will mount `~/airflow/logs` as the logs dir and `$AIRFLOW_ROOT_DIR/airflow/example_dags` as the dags folder.  But you can change this by setting variables `AIRFLOW_HOST_PATH_DAGS` and `AIRFLOW_HOST_PATH_DAGS` prior to sourcing `aenv.sh`.
 
-```bash
-AIRFLOW_HOST_PATH_DAGS=$AIRFLOW_ROOT_DIR/airflow/example_dags
-AIRFLOW_HOST_PATH_LOGS=$HOME/airflow/logs
-```
-
-Next, create the volumes and volume claims:
+To create the volumes and volume claims:
 
 ```bash
 # create shared volumes for k8s executor and KPO
