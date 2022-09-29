@@ -1,6 +1,8 @@
 # What is `aenv`?
 
-`aenv` is a way of modifying airflow environment variables to set up different configurations.
+`aenv` is a set of helper functions and aliases for modifying Airflow environment variables to set up different configurations.  It useful if you run airflow on your host in a virtualenv and need to change between executors and database backends frequently.
+
+It's assumed that you already have the database backends running in your host machine.
 
 So for example if you want to use kubernetes executor with mysql backend and only example_bash_operator.py, you can enter this:
 
@@ -8,49 +10,101 @@ So for example if you want to use kubernetes executor with mysql backend and onl
 aenv --kubernetes --mysql --example-dag example_bash_operator.py
 ```
 
+Also included are lower level methods if you just want to change one aspect of your configuration:
+
+```bash
+# change database backend
+use-mysql
+use-postgres
+use-sqlite
+use-mssql
+
+# change dags folder
+use-example-dag
+use-dag
+
+# change executor
+use-local-executor
+use-kubernetes-executor
+use-sequential-executor
+use-celery-executor
+
+# print relevant airflow env vars
+echo-airflow-env
+```
+
+
 # Why?
 
-For a while I was using lower-level helpers like `use-kubernetes-executor`, `use-mysql`, `use-example-dag` to accomplish the same thing.  But then I like to run scheduler in this pane, webserver in that pane, and I needed a way to set up the same configuration in both terminal sessions.  So I figured package them up in a utility so I can use a one-liner.
+As an Airflow developer, I frequently need to switch database backends and executors. I strongly prefer working in a virtualenv over docker because of the speed, lighter resource footprint, and better debugging. And I found these utilities very helpful for this kind of workflow.
 
-# Anything else?
+The lower-level helpers like `use-mysql` and `use-sqlite` are great when you just want to change one aspect of your setup.  For setting up the same configuration in multiple terminal sessions, that's why the `aenv` wrapper exists.
 
-Well, to use k8s executor locally with a virtualenv scheduler, you need to coordinate a few things.  You need to to get your dags in the image (ideally without rebuilding) and you need to get your logs out of the container.  To do this you create hostpath PVCs. In this repo we also include helpers to do this: `create-dags-volume` and `create-logs-volume`.
+# Installation
 
-Read on for more details.
-
-# Source `aenv.sh` into your shell
-
-E.g. add this to `.zshrc`:
+Add `aenv.sh` to your shell profile, e.g.:
 
 ```shell
 source ~/code/aenv/aenv.sh
 ```
 
-# Create dags and logs volumes for k8s
+Ensure that `aenv` knows where your airflow repo is:
 
 ```bash
-create-dags-volume
-create-logs-volume
+AIRFLOW_ROOT_DIR=$HOME/code/airflow  # <-- default is ~/code/airflow
 ```
 
-# Settings
+
+# Using k8s executor and KPO
+
+To use k8s executor locally with a virtualenv scheduler, you need to coordinate a few things.  You need to to get your dags in the image (ideally without rebuilding) and you need to get your logs out of the container.  To do this you create hostpath persistent volumes.
+
+First, set these values to something else if desired (defaults shown here):
 
 ```bash
-AIRFLOW_ROOT_DIR=$HOME/code/airflow
 AIRFLOW_HOST_PATH_DAGS=$AIRFLOW_ROOT_DIR/airflow/example_dags
 AIRFLOW_HOST_PATH_LOGS=$HOME/airflow/logs
 ```
 
-You can override any of these by setting them before sourcing `aenv.sh`.
+Next, create the volumes and volume claims:
 
-# Dependencies
+```bash
+# create shared volumes for k8s executor and KPO
+create-dags-volume
+create-logs-volume
 
-## Database backends
+# you'll need to delete them and recreate if you want to change
+delete-dags-volume
+delete-logs-volume
+```
 
-Depending on which DB backend you want to use, it assumes they are configured with creds and locations as defined in `aenv.sh`.
+The included `pod_template.yaml` references the PVCs so that you can share logs and dags between your k8s pods and your host.  Your environment will be configured to use this template file when you switch to kubernetes executor.  This lets you access your k8s task logs from your webserver (running on host in virtualenv).  And it lets you change dag code without rebuilding your image.
 
-## Docker images
+Other k8s helpers:
+
+```bash
+# switch the default image used for k8s executor
+use-image  # default: `use-image local latest`
+
+# remove up leftover pods
+delete-pods-errored
+delete-pods-completed
+```
+
+# Docker images
 
 Default assumption is that you want to use docker image local:latest.
 
 You can change this with env vars or with helper `use-image some-image some-tag` or just set the normal env vars.
+
+# MSSQL
+
+On a mac, it's easy enough to get mysql, postgres and sqlite installed and leave them running in the background on the host.
+
+But to run MSSQL you need to run it in docker.  Included here is a function to spin up an instance for you:
+
+```bash
+# spins up a mssql container with port 1433 and admin password `$MSSQL_DEV_PASSWORD` (default: Abc123456)
+# also uses a docker volume for persistent
+start-mssql  
+```
