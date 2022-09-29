@@ -92,7 +92,7 @@ delete-pods-completed
 
 # Docker images
 
-Default assumption is that you want to use docker image local:latest.
+Default assumption is that you want to use docker image `local:latest`.
 
 You can change this with env vars or with helper `use-image some-image some-tag` or just set the normal env vars.
 
