@@ -1,6 +1,6 @@
-# What is `aenv`?
+# What is this?
 
-`aenv` is a tool intended for Airflow developers who prefer using virtualenv to docker.  It makes it easy to change your configuration from one executor or backend to another.
+This repo is a tool intended for Airflow developers who prefer using virtualenv to docker.  It makes it easy to change your configuration from one executor or backend to another.
 
 It's assumed that you already have the database backends running in your host machine.
 
@@ -22,9 +22,6 @@ use-local-executor
 use-kubernetes-executor
 use-sequential-executor
 use-celery-executor
-
-# print relevant airflow env vars
-echo-airflow-env
 ```
 
 To change more than one attribute in one line, you can use the `aenv` command. For example, if you want to use kubernetes executor with mysql backend and only example_bash_operator.py, you can enter this:
@@ -34,6 +31,13 @@ aenv --kubernetes --mysql --example-dag example_bash_operator.py
 ```
 
 This is helpful when you want to use the same configuration in multiple terminal windows.
+
+To print your configuration:
+
+```bash
+# print relevant airflow env vars
+echo-airflow-env
+```
 
 # Why?
 
