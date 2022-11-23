@@ -107,3 +107,18 @@ But to run MSSQL you need to run it in docker.  Included here is a function to s
 # also uses a docker volume for persistent
 start-mssql  
 ```
+
+Before you use airflow with mssql, you need to set up the database.
+
+First connect to the server:
+
+```bash
+mssql-cli -U sa -P Abc123456 -S localhost
+```
+
+Then create the database and set isolation level:
+
+```sql
+CREATE DATABASE	testing;
+ALTER DATABASE testing SET READ_COMMITTED_SNAPSHOT ON;
+```

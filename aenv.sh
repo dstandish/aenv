@@ -236,6 +236,13 @@ aenv() {
 
 alias delete-pods-errored="kgp | grep -v NAME | grep Error | cut -d ' '  -f1 | xargs -I {} kubectl delete pod {}"
 alias delete-pods-completed="kgp | grep -v NAME | grep Completed | cut -d ' '  -f1 | xargs -I {} kubectl delete pod {}"
+alias delete-pods-terminating="kgp | grep -v NAME | grep Terminating | cut -d ' '  -f1 | xargs -I {} kubectl delete pod {}"
+
+alias echo-pods-errored="kgp | grep -v NAME | grep Error | cut -d ' '  -f1"
+alias echo-pods-completed="kgp | grep -v NAME | grep Completed | cut -d ' '  -f1"
+alias echo-pods-terminating="kgp | grep -v NAME | grep Terminating | cut -d ' '  -f1"
+
+
 
 start-mssql() {
   docker run -e "ACCEPT_EULA=Y" \
