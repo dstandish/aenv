@@ -12,8 +12,8 @@ MSSQL_DEV_PASSWORD=Abc123456
 AENV_DIR="$(dirname $0)"
 
 
-export AIRFLOW__KUBERNETES__WORKER_CONTAINER_REPOSITORY="${AIRFLOW__KUBERNETES__WORKER_CONTAINER_REPOSITORY:=local}"
-export AIRFLOW__KUBERNETES__WORKER_CONTAINER_TAG="${AIRFLOW__KUBERNETES__WORKER_CONTAINER_TAG:=latest}"
+export AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_REPOSITORY="${AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_REPOSITORY:=local}"
+export AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_TAG="${AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_TAG:=latest}"
 
 export AIRFLOW_HOST_PATH_LOGS="${AIRFLOW_HOST_PATH_LOGS:=$HOME/airflow/logs}"
 
@@ -85,20 +85,20 @@ use-celery-executor() {
 }
 
 use-image() {
-  export AIRFLOW__KUBERNETES__WORKER_CONTAINER_REPOSITORY="${1-"local"}"
-  export AIRFLOW__KUBERNETES__WORKER_CONTAINER_TAG="${2-"latest"}"
-  echo "Configured image $AIRFLOW__KUBERNETES__WORKER_CONTAINER_REPOSITORY:$AIRFLOW__KUBERNETES__WORKER_CONTAINER_TAG"
+  export AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_REPOSITORY="${1-"local"}"
+  export AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_TAG="${2-"latest"}"
+  echo "Configured image $AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_REPOSITORY:$AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_TAG"
 }
 
 use-kubernetes-executor() {
-  export AIRFLOW__KUBERNETES__IN_CLUSTER=False
+  export AIRFLOW__KUBERNETES_EXECUTOR__IN_CLUSTER=False
   export AIRFLOW__CORE__EXECUTOR=KubernetesExecutor
-  export AIRFLOW__KUBERNETES__POD_TEMPLATE_FILE="$AENV_DIR/pod_template.yaml"
+  export AIRFLOW__KUBERNETES_EXECUTOR__POD_TEMPLATE_FILE="$AENV_DIR/pod_template.yaml"
   # export AIRFLOW__LOGGING__BASE_LOG_FOLDER="$AIRFLOW_HOST_PATH_LOGS"
   echo ""
   echo "using kubernetes executor"
-  echo "    - template file: $AIRFLOW__KUBERNETES__POD_TEMPLATE_FILE"
-  echo "    - image: $AIRFLOW__KUBERNETES__WORKER_CONTAINER_REPOSITORY:$AIRFLOW__KUBERNETES__WORKER_CONTAINER_TAG"
+  echo "    - template file: $AIRFLOW__KUBERNETES_EXECUTOR__POD_TEMPLATE_FILE"
+  echo "    - image: $AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_REPOSITORY:$AIRFLOW__KUBERNETES_EXECUTOR__WORKER_CONTAINER_TAG"
 }
 
 use-local-executor() {
@@ -172,7 +172,7 @@ delete-logs-volume() {
 
 aenv() {
   POSITIONAL_ARGS=()
-
+  venv_name="local"
   while [[ $# -gt 0 ]]; do
     case $1 in
       --mysql)
@@ -218,6 +218,11 @@ aenv() {
         use-celery-executor
         shift
         ;;
+      --venv)
+        venv_name="$2"
+        shift
+        shift
+        ;;
       -*|--*)
         echo "Unknown option $1"
         break
@@ -229,6 +234,8 @@ aenv() {
         ;;
     esac
   done
+  echo "activating virtualenv $venv_name"
+  workon "$venv_name"
   echo ""
   echo-airflow-env
 }
